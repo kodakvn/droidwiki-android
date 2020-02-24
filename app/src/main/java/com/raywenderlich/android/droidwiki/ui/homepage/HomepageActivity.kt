@@ -46,59 +46,59 @@ import com.raywenderlich.android.droidwiki.utils.errorDialog
 
 class HomepageActivity : Activity(), HomepageView {
 
-  private val presenter: HomepagePresenter = HomepagePresenterImpl()
+    private val presenter: HomepagePresenter = HomepagePresenterImpl()
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_homepage)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_homepage)
 
-    presenter.setView(this)
-    presenter.loadHomepage()
-  }
+        presenter.setView(this)
+        presenter.loadHomepage()
+    }
 
-  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-    menuInflater.inflate(R.menu.homepage, menu)
-    return super.onCreateOptionsMenu(menu)
-  }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.homepage, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
 
-  override fun onOptionsItemSelected(item: MenuItem) =
-      when (item.itemId) {
-        R.id.search -> {
-          SearchActivity::class.start(this)
-          true
+    override fun onOptionsItemSelected(item: MenuItem) =
+            when (item.itemId) {
+                R.id.search -> {
+                    SearchActivity::class.start(this)
+                    true
+                }
+
+                else -> {
+                    super.onOptionsItemSelected(item)
+                }
+            }
+
+    // Implementation of HomepageView
+
+    override fun displayLoading() {
+        wait_progress_bar.post {
+            wait_progress_bar.visibility = View.VISIBLE
+            homepage_sv.visibility = View.GONE
         }
+    }
 
-        else -> {
-          super.onOptionsItemSelected(item)
+    override fun dismissLoading() {
+        wait_progress_bar.post {
+            wait_progress_bar.visibility = View.GONE
+            homepage_sv.visibility = View.VISIBLE
         }
-      }
-
-  // Implementation of HomepageView
-
-  override fun displayLoading() {
-    wait_progress_bar.post {
-      wait_progress_bar.visibility = View.VISIBLE
-      homepage_sv.visibility = View.GONE
     }
-  }
 
-  override fun dismissLoading() {
-    wait_progress_bar.post {
-      wait_progress_bar.visibility = View.GONE
-      homepage_sv.visibility = View.VISIBLE
+    override fun displayHomepage(result: WikiHomepage) {
+        homepage_tv.post {
+            homepage_tv.text = result.htmlContent.parseHtml()
+        }
     }
-  }
 
-  override fun displayHomepage(result: WikiHomepage) {
-    homepage_tv.post {
-      homepage_tv.text = result.htmlContent.parseHtml()
+    override fun displayError(error: String?) {
+        Log.e("ERROR", error)
+        runOnUiThread {
+            R.string.error.errorDialog(this)
+        }
     }
-  }
-
-  override fun displayError(error: String?) {
-    Log.e("ERROR", error)
-    runOnUiThread {
-      R.string.error.errorDialog(this)
-    }
-  }
 }
